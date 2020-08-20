@@ -32,15 +32,15 @@ HOSTNAME=$( hostname )
 
 rsync \
 	--archive \
-	--verbose \
 	--compress \
-	--human-readable \
-	--progress \
-	--stats \
 	--delete \
 	--delete-excluded \
-	--log-file="$LOGS/$JOBNAME.log" \
+	--human-readable \
 	--link-dest="$DEST/$JOBNAME.1" \
+	--log-file="$LOGS/$JOBNAME.log" \
+	--progress \
+	--stats \
+	--verbose \
 	"$SRC/" "$DEST/$JOBNAME"
 
 RESULT=$?
