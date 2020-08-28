@@ -40,8 +40,10 @@ rsync \
 	--fileflags \
 	--force-change \
 	--human-readable \
+	--inplace \
 	--link-dest="$DEST/$JOBNAME.1" \
 	--log-file="$LOGS/$JOBNAME.log" \
+	--partial \
 	--progress \
 	--stats \
 	--verbose \
