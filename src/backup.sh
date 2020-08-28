@@ -39,10 +39,13 @@ rsync \
 	--delete-excluded \
 	--fileflags \
 	--force-change \
+	--hard-links \
 	--human-readable \
 	--inplace \
+	--itemize-changes \
 	--link-dest="$DEST/$JOBNAME.1" \
 	--log-file="$LOGS/$JOBNAME.log" \
+	--one-file-system \
 	--partial \
 	--progress \
 	--stats \
