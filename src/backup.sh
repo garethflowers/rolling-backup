@@ -34,6 +34,7 @@ rsync \
 	--acls \
 	--archive \
 	--compress \
+	--crtimes \
 	--delete \
 	--delete-excluded \
 	--fileflags \
