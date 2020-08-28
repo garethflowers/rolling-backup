@@ -31,16 +31,20 @@ HOSTNAME=$( hostname )
 # BACKUP
 
 rsync \
+	--acls \
 	--archive \
 	--compress \
 	--delete \
 	--delete-excluded \
+	--fileflags \
+	--force-change \
 	--human-readable \
 	--link-dest="$DEST/$JOBNAME.1" \
 	--log-file="$LOGS/$JOBNAME.log" \
 	--progress \
 	--stats \
 	--verbose \
+	--xattrs \
 	"$SRC/" "$DEST/$JOBNAME"
 
 RESULT=$?
