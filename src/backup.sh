@@ -37,6 +37,8 @@ rsync \
 	--crtimes \
 	--delete \
 	--delete-excluded \
+	--exclude="._*" \
+	--exclude=".DS_Store" \
 	--fileflags \
 	--force-change \
 	--hard-links \
