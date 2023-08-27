@@ -7,12 +7,13 @@ SRC=$1
 DEST=$2
 JOBNAME=$3
 
-[ -z "$SRC" ] && echo "No source directory set!" && exit -1
-[ -z "$DEST" ] && echo "No destination directory set!" && exit -1
+# VARS
 
-LOGS=$DEST/logs
+LOGS=$DEST/Logs
 HOSTNAME=$( hostname )
-[ -z "$JOBNAME" ] && JOBNAME=backup
+[ -z "$SRC" ] && echo "No Source directory set!" && exit $?
+[ -z "$DEST" ] && echo "No Destination directory set!" && exit $?
+[ -z "$JOBNAME" ] && echo "No Job Name set!" && exit $?
 
 # ROTATE
 
@@ -29,6 +30,7 @@ HOSTNAME=$( hostname )
 [ -f "$LOGS/$JOBNAME.log" ] && mv "$LOGS/$JOBNAME.log" "$LOGS/$JOBNAME.1.log"
 mkdir -p "$DEST/$JOBNAME"
 touch "$DEST"
+touch "$LOGS"
 
 # BACKUP
 
@@ -41,15 +43,9 @@ rsync \
 	--exclude=".DS_Store" \
 	--hard-links \
 	--human-readable \
-	--inplace \
-	--itemize-changes \
 	--link-dest="$DEST/$JOBNAME.1" \
 	--log-file="$LOGS/$JOBNAME.log" \
-	--partial \
-	--progress \
-	--stats \
 	--times \
-	--verbose \
 	"$SRC/" \
 	"$DEST/$JOBNAME"
 

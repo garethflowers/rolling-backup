@@ -6,15 +6,17 @@ set -e
 SRC=$1
 DEST=$2
 JOBNAME=$3
-SSH=$4
 
-[ -z "$SRC" ] && echo "No source directory set!" && exit -1
-[ -z "$DEST" ] && echo "No destination directory set!" && exit -1
-[ -z "$SSH" ] && echo "No SSH 'user@host' set!" && exit -1
+# VARS
 
-LOGS="$DEST/logs"
+SSH=$( cut -d ':' -f 1 <<< $DEST )
+DEST=$( cut -d ':' -f 2 <<< $DEST )
+LOGS="$DEST/Logs"
 HOSTNAME=$( hostname )
-[ -z "$JOBNAME" ] && JOBNAME=backup
+[ -z "$SRC" ] && echo "No Source directory set!" && exit $?
+[ -z "$DEST" ] && echo "No Destination directory set!" && exit $?
+[ -z "$JOBNAME" ] && echo "No Job Name set!" && exit $?
+[ -z "$SSH" ] && echo "No SSH information in Destination!" && exit $?
 
 # ROTATE
 
@@ -30,8 +32,10 @@ ssh $SSH '
 [ -f "'$LOGS'/'$JOBNAME'.1.log" ] && mv "'$LOGS'/'$JOBNAME'.1.log" "'$LOGS'/'$JOBNAME'.2.log"
 [ -d "'$DEST'/'$JOBNAME'" ] && mv "'$DEST'/'$JOBNAME'" "'$DEST'/'$JOBNAME'.1"
 [ -f "'$LOGS'/'$JOBNAME'.log" ] && mv "'$LOGS'/'$JOBNAME'.log" "'$LOGS'/'$JOBNAME'.1.log"
-[ ! -d "'$DEST'" ] && mkdir -p "'$DEST'/'$JOBNAME'"
+mkdir -p "'$DEST'/'$JOBNAME'"
+mkdir -p "'$LOGS'"
 touch "'$DEST'"
+touch "'$LOGS'"
 '
 
 # BACKUP
@@ -45,16 +49,10 @@ sudo rsync \
 	--exclude=".DS_Store" \
 	--hard-links \
 	--human-readable \
-	--inplace \
-	--itemize-changes \
 	--remote-option=--link-dest="$DEST/$JOBNAME.1" \
 	--remote-option=--log-file="$LOGS/$JOBNAME.log" \
-	--partial \
 	--rsh=ssh \
-	--progress \
-	--stats \
 	--times \
-	--verbose \
 	"$SRC/" \
 	"$SSH:$DEST/$JOBNAME"
 
