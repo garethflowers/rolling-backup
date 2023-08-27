@@ -6,19 +6,19 @@ set -e
 SRC=$1
 DEST=$2
 JOBNAME=$3
+
+[ -z "$SRC" ] && echo "No source directory set!" && exit -1
+[ -z "$DEST" ] && echo "No destination directory set!" && exit -1
+
 LOGS=$DEST/logs
 HOSTNAME=$( hostname )
-
-[ -z "$SRC" ] && echo "No source set!"
-[ -z "$DEST" ] && echo "No destination set!"
-
 [ -z "$JOBNAME" ] && JOBNAME=backup
-[ -f "$DEST" ] && rm -f "$DEST"
-[ ! -d "$DEST" ] && mkdir -p "$DEST"
-[ ! -d "$LOGS" ] && mkdir -p "$LOGS"
 
 # ROTATE
 
+[ -f "$DEST" ] && rm -f "$DEST"
+[ ! -d "$DEST" ] && mkdir -p "$DEST"
+[ ! -d "$LOGS" ] && mkdir -p "$LOGS"
 [ -d "$DEST/$JOBNAME.3" ] && rm -fr "$DEST/$JOBNAME.3"
 [ -f "$LOGS/$JOBNAME.3.log" ] && rm -f "$LOGS/$JOBNAME.3.log"
 [ -d "$DEST/$JOBNAME.2" ] && mv "$DEST/$JOBNAME.2" "$DEST/$JOBNAME.3"
@@ -27,38 +27,33 @@ HOSTNAME=$( hostname )
 [ -f "$LOGS/$JOBNAME.1.log" ] && mv "$LOGS/$JOBNAME.1.log" "$LOGS/$JOBNAME.2.log"
 [ -d "$DEST/$JOBNAME" ] && mv "$DEST/$JOBNAME" "$DEST/$JOBNAME.1"
 [ -f "$LOGS/$JOBNAME.log" ] && mv "$LOGS/$JOBNAME.log" "$LOGS/$JOBNAME.1.log"
+mkdir -p "$DEST/$JOBNAME"
+touch "$DEST"
 
 # BACKUP
 
 rsync \
-	--acls \
 	--archive \
-	--compress \
-	--crtimes \
+	--atimes \
 	--delete \
 	--delete-excluded \
 	--exclude="._*" \
 	--exclude=".DS_Store" \
-	--fileflags \
-	--force-change \
 	--hard-links \
 	--human-readable \
 	--inplace \
 	--itemize-changes \
 	--link-dest="$DEST/$JOBNAME.1" \
 	--log-file="$LOGS/$JOBNAME.log" \
-	--one-file-system \
 	--partial \
 	--progress \
 	--stats \
+	--times \
 	--verbose \
-	--xattrs \
-	"$SRC/" "$DEST/$JOBNAME"
+	"$SRC/" \
+	"$DEST/$JOBNAME"
 
 RESULT=$?
-
-mkdir -p "$DEST/$JOBNAME"
-touch "$DEST"
 
 # NOTIFICATIONS
 
